@@ -21,7 +21,7 @@ async def get():
 async def alsoget():
     try:
         json = await get()
-        j = json["audio_source"], 300
+        j = json["audio_source"], 302
     except JSONDecodeError:
         return "Failed to get track information. Does it exist?", 404
     return redirect(*j)
