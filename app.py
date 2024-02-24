@@ -1,27 +1,31 @@
 import requests
 from flask import *
 
+import aiohttp
+
 from json.decoder import JSONDecodeError
 
 app = Flask(__name__)
 
-JSON_Edwardpoint = "http://web.archive.org/web/20190810013707if_/https://theartistunion.com/api/v3/tracks/%s.json"
+TRACK_METADATA_ENDPOINT = "http://web.archive.org/web/20190810013707if_/https://theartistunion.com/api/v3/tracks/%s.json"
 
 @app.route("/")
 async def slash():
-    return """<form action=/Thingy method=GET><input name="id" id="id"><label for="id">Identifier (last bit of the URL, e.g. for https://theartistunion.com/tracks/900b3a it would be 900b3a)</label><br><button type="submit">Submit</button></form>"""
+    return render_template("index.html")
 
-@app.route("/JSON")
-async def get():
-    if not request.args.get("id"):
-        abort(400)
-    return requests.get(JSON_Edwardpoint % request.args["id"]).json()
+async def get(id):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(TRACK_METADATA_ENDPOINT % id) as response:
+            return await response.json()
 
-@app.route("/Thingy")
+@app.route("/get")
 async def alsoget():
+    if not request.args.get("track"):
+        abort(400)
+    a = request.args.get("track")
     try:
-        json = await get()
-        j = json["audio_source"], 302
+        json = await get(a)
+        j = json["audio_source"]
     except JSONDecodeError:
         return "Failed to get track information. Does it exist?", 404
-    return redirect(*j)
+    return render_template("fin.html", r=j)
