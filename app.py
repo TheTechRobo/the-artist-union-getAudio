@@ -56,6 +56,14 @@ async def get(id):
                         results.append((i, True))
     return results, warn
 
+@app.route("/get/<track>.json")
+async def apiget(track):
+    results, warn = await get(track)
+    rn = []
+    for url, original in results:
+        rn.append({"url": url, "original": original})
+    return {"unrecognised_url_format": warn, "results": rn}
+
 @app.route("/get")
 async def alsoget():
     if not request.args.get("track"):
