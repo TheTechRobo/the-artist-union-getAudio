@@ -9,7 +9,21 @@
   <body>
   <div class="container">
       <h1>Results</h1>
-      <p>Discovered search result for video: <a href="{{r}}">here</a>.</p>
+      <ul><li><a href="/">Check another</a></li></ul>
+      {% if r %}
+      	<p>Discovered {{len(r)}} results:</p>
+	      <ul>
+          {% for url, is_high_quality in r %}
+            <li><a href="https://web.archive.org/web/0/{{url}}" target="_blank">{{url}}</a> {% if is_high_quality %} (high-quality) {% endif %}</li>
+          {% endfor %}
+        </ul>
+        {% if warn %}
+          <p>The audio file uses an unrecognised URL format. Please let us know on IRC - we might be able to track down a higher-quality version (and improve the tool)!</p>
+        {% endif %}
+      {% else %}
+        <p>No results found for the video, I'm afraid.</p>
+        <p>Let us know on IRC if you think this is a bug!</p>
+      {% endif %}
   </div>
   </body>
 </html>
